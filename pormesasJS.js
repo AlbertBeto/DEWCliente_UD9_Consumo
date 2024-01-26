@@ -66,7 +66,7 @@ pro
 
 //PReguntar por un personaje concreto, cunado llegue lo imprimios y luego consultamos nuevamente que pelicualas ha participado y cuando llegue lo imprimimos. 
 
-
+/*
 function llamadaApi(url) {
     //LA primera funcion es para el .then y la segunda para el .catch
     return new Promise((resolver, rechazar) => {
@@ -85,7 +85,7 @@ function llamadaApi(url) {
     });
 }
 
-let llamadapersonaje = llamadaApi("https://swapi.dev/api/people/8/");
+let llamadapersonaje = llamadaApi("https://swapi.dev/api/people/2/");
 
 llamadapersonaje
     .then(personaje => {
@@ -97,7 +97,39 @@ llamadapersonaje
     })
     //Si queremos hacer un segundo .then tenemos que modificar el primer .then para que devuelva algo, sino la promesa que se crea devuelve nada
     .then(planeta => console.log("Planeta nacimiento: "+planeta.name))
-
-       
     .catch(incorrecto => console.log("errorrrr "));
 
+*/
+
+//Vamos a llamr pelis 
+function llamadaApi(url) {
+    //LA primera funcion es para el .then y la segunda para el .catch
+    return new Promise((resolver, rechazar) => {
+        let req = new XMLHttpRequest();
+        req.onload = function () {
+            if (req.status >= 200 && req.status < 400) {
+                let respuesta = JSON.parse(this.response);
+                resolver(respuesta);
+            }
+            else {
+                rechazar("error " + req.status + ":" + req.statusText);
+            }
+        }
+        req.open("GET", url, true);
+        req.send();
+    });
+}
+
+let llamadapersonaje = llamadaApi("https://swapi.dev/api/people/2/");
+
+llamadapersonaje
+    .then(personaje => {
+        console.log("Personaje nombre: " + personaje.name);
+        //Una vez que tenemos el persoaje, consultamos las pelis que contien un array.
+        let arraydepromesas=personaje.films.map(peli=>llamadaApi(peli));
+        return Promise.all(arraydepromesas);
+        })
+        //Aquí creamos la siguiente llamada ya que tenemos los datos del objeto y el campo a llamar de sus campos es una url.
+    //Si queremos hacer un segundo .then tenemos que modificar el primer .then para que devuelva algo, sino la promesa que se crea devuelve nada
+    .then(peli => console.log(peli))
+    .catch(incorrecto => console.log("errorrrr "));
