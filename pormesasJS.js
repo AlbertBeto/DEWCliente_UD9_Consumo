@@ -101,6 +101,7 @@ llamadapersonaje
 
 */
 
+/*
 //Vamos a llamr pelis 
 function llamadaApi(url) {
     //LA primera funcion es para el .then y la segunda para el .catch
@@ -132,4 +133,73 @@ llamadapersonaje
         //Aquí creamos la siguiente llamada ya que tenemos los datos del objeto y el campo a llamar de sus campos es una url.
     //Si queremos hacer un segundo .then tenemos que modificar el primer .then para que devuelva algo, sino la promesa que se crea devuelve nada
     .then(peli => console.log(peli))
-    .catch(incorrecto => console.log("errorrrr "));
+    .catch(incorrecto => console.log(incorrecto));
+
+    //Pasemos por pantalla de los pjs cuando pinchemos tiene que desplegarse las peliculas y a a derecha de la pelicula que
+    //se despliegue el listado de planetas que salen en cada pelicula
+    /*
+    El orden tiene que ser:
+    Personaje
+    Peliculas: (Desplegable donde escoges la pelis)
+        //Y a continuacion nos muestras los planetas que sales.
+        Planeta1
+        Planeta2
+    */
+
+function llamadaApi(url) {
+    //LA primera funcion es para el .then y la segunda para el .catch
+    return new Promise((resolver, rechazar) => {
+        let req = new XMLHttpRequest();
+        req.onload = function () {
+            if (req.status >= 200 && req.status < 400) {
+                let respuesta = JSON.parse(this.response);
+                resolver(respuesta);
+            }
+            else {
+                rechazar("error " + req.status + ":" + req.statusText);
+            }
+        }
+        req.open("GET", url, true);
+        req.send();
+    });
+}
+
+let llamadapersonaje = llamadaApi("https://swapi.dev/api/people/2/");
+
+llamadapersonaje
+    .then(personaje => {
+        let padre = document.getElementById("inicio");
+        let pj = document.createElement("p");
+        pj.textContent = personaje.name;
+        padre.appendChild(pj);
+        //Una vez que tenemos el persoaje, consultamos las pelis que contien un array.
+        let arraydepromesas = personaje.films.map(peli => llamadaApi(peli));
+        return Promise.all(arraydepromesas);
+    })
+    //Aquí creamos la siguiente llamada ya que tenemos los datos del objeto y el campo a llamar de sus campos es una url.
+    //Si queremos hacer un segundo .then tenemos que modificar el primer .then para que devuelva algo, sino la promesa que se crea devuelve nada
+    .then(peli => {
+        let selector = document.createElement("select");
+        let contenedor_padre = document.getElementById("inicio");
+        peli.forEach(titulo => {
+            let neo_option = document.createElement("option");
+                neo_option.textContent = titulo.title;
+                selector.appendChild(neo_option);
+                
+        })
+        contenedor_padre.appendChild(selector)
+        ;
+
+    
+    
+        
+            
+
+
+
+        console.log(peli);
+
+    })
+    .catch(incorrecto => console.log(incorrecto));
+
+
