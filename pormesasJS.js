@@ -180,26 +180,45 @@ llamadapersonaje
     //Si queremos hacer un segundo .then tenemos que modificar el primer .then para que devuelva algo, sino la promesa que se crea devuelve nada
     .then(peli => {
         let selector = document.createElement("select");
+        selector.id="desplegable";
         let contenedor_padre = document.getElementById("inicio");
         peli.forEach(titulo => {
             let neo_option = document.createElement("option");
-                neo_option.textContent = titulo.title;
-                selector.appendChild(neo_option);
-                
+            neo_option.textContent = titulo.title;
+            neo_option.value = titulo.planets;
+            selector.appendChild(neo_option);
+            console.log(neo_option.value);
         })
-        contenedor_padre.appendChild(selector)
-        ;
+        contenedor_padre.appendChild(selector);
 
-    
-    
-        
+
+
+
+        selector.addEventListener("change", plant => {
+            let peliescogida = document.getElementById("desplegable").value;
             
-
-
-
-        console.log(peli);
-
+            console.log(peliescogida);
+            //Aqui me he quedado
+            let arraydeplanetas = peliescogida.map(planet => llamadaApi(planet));
+            console.log(arraydeplanetas);
+            Promise.all(arraydeplanetas)
+            .then(planetos => {
+                let neoplanet = document.createElement("div");
+                let contenedor_padre = document.getElementById("inicio");
+                planetos.forEach(titulo => {
+                    let planeta = document.createElement("p");
+                    planeta.textContent = titulo.name;
+                    neoplanet.appendChild(planeta);
+        
+                })
+                contenedor_padre.appendChild(neoplanet);       
+            })
+            .catch (incorrecto => console.log(incorrecto));
+        })
     })
-    .catch(incorrecto => console.log(incorrecto));
+
+    
+    
+    .catch (incorrecto => console.log(incorrecto));
 
 
