@@ -222,3 +222,6 @@ llamadapersonaje
     .catch (incorrecto => console.log(incorrecto));
 
 
+/*
+fetch("https://apidireccion", opciones);
+*/
